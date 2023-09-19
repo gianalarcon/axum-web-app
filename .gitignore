@@ -2,16 +2,14 @@
 .*
 !.gitignore
 
-# Allow vscode 
-# !.vscode
-
-# By default
-_*
-
 # -- Rust
+# For .cargo/config.toml
+!.cargo/
 target/
-# '_' in src dir, ok.
-!src/**/_*
+
+# For blueprint ignore Cargo.lock
+# (commit Cargo.lock for real project)
+Cargo.lock
 
 
 # -- Safety net
