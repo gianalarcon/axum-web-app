@@ -8,8 +8,11 @@ mod error;
 mod log;
 mod model;
 mod web;
+// #[ctg(test)] // Commented during early development
+pub mod _dev_utils;
 
 pub use self::error::{Error, Result};
+pub use config::config;
 
 use crate::model::ModelManager;
 use crate::web::mw_auth::mw_ctx_resolve;
