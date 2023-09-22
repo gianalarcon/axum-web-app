@@ -30,9 +30,61 @@ impl TaskBmc {
 		_ctx: &Ctx,
 		mm: &ModelManager,
 		task_c: TaskForCreate,
-	) -> Result<u64> {
+	) -> Result<i64> {
 		let db = mm.db();
+		let (id,) = sqlx::query_as::<_, (i64,)>(
+			"INSERT INTO task (title) values ($1) returning id",
+		)
+		.bind(task_c.title)
+		.fetch_one(db)
+		.await?;
 
-		todo!()
+		Ok(id)
 	}
 }
+// endregion: --- TaskBmc
+
+// region:		--- Tests
+#[cfg(test)]
+mod tests {
+	#![allow(unused)]
+	use crate::_dev_utils;
+
+	use super::*;
+	use anyhow::{Ok, Result};
+	use serial_test::serial;
+o
+	#[serial]
+	#[tokio::test]
+	async fn test_create_ok() -> Result<()> {
+		// -- Setup & Fixtures
+		let mm = _dev_utils::init_test().await;
+		let ctx = Ctx::root_ctx();
+		let fx_title = "test_create_ok title";
+
+		// -- Exec
+		let task_c = TaskForCreate {
+			title: fx_title.to_string(),
+		};
+		let id = TaskBmc::create(&ctx, &mm, task_c).await?;
+
+		// -- Check
+		let (title,): (String,) =
+			sqlx::query_as("SELECT title from task where id = $1")
+				.bind(id)
+				.fetch_one(mm.db())
+				.await?;
+		assert_eq!(title, fx_title);
+
+		// -- Clean
+		let count = sqlx::query("DELETE FROM task WHERE id = $1")
+			.bind(id)
+			.execute(mm.db())
+			.await?
+			.rows_affected();
+		assert_eq!(count, 1, "Did not delete 1 row?");
+
+		Ok(())
+	}
+}
+// endregion: --- Tests
