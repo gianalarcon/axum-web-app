@@ -3,13 +3,14 @@ use crate::model::Error;
 use crate::model::ModelManager;
 use crate::model::Result;
 use serde::{Deserialize, Serialize};
+use sqlb::Fields;
 use sqlx::FromRow;
 
 use super::base;
 use super::base::DbBmc;
 
 // region:		--- Task types
-#[derive(Debug, Clone, FromRow, Serialize)]
+#[derive(Debug, Clone, Fields, FromRow, Serialize)]
 pub struct Task {
 	pub id: i64,
 	pub title: String,
