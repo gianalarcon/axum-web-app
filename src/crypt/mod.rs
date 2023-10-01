@@ -4,7 +4,7 @@ mod error;
 pub mod pwd;
 pub mod token;
 pub use self::error::{Error, Result};
-
+use crate::utils::b64u_encode;
 use hmac::{Hmac, Mac};
 use sha2::Sha512;
 
@@ -31,10 +31,8 @@ pub fn encrypt_into_b64u(
 
 	// -- Finalize and b64u encode.
 	let hmac_result = hmac_sha512.finalize();
-	let result_bytes = hmac_result.into_bytes();
 
-	let result = base64_url::encode(&result_bytes);
-
+	let result = b64u_encode(hmac_result.into_bytes());
 	Ok(result)
 }
 
